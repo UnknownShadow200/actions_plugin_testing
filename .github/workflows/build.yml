@@ -103,8 +103,8 @@ jobs:
 
       - name: Compile plugin
         env:
-          MACINT_CC: "-arch x86_64"
-          MACARM_CC: "-arch arm64"
+          MACINT_CC: "clang -arch x86_64"
+          MACARM_CC: "clang -arch arm64"
           INCS:  "-I ./ClassiCube-master/src/"
           FLAGS: "-O1 -g -fno-stack-protector -fno-math-errno -Qn -shared -Werror"
         run: |         
