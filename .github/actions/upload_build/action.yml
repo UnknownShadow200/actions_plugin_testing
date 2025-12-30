@@ -27,12 +27,10 @@ runs:
         if-no-files-found: error
 
     - name: Do release
-      uses: softprops/action-gh-release@v2
+      uses: svenstaro/upload-release-action@v2
       env:
         GITHUB_TOKEN: ${{ inputs.GH_TOKEN }}
       with:
-        name: ${{ inputs.GROUP_NAME }}
-        tag_name: Release ${{ inputs.GROUP_NAME }}
-        draft: false
-        prerelease: false
-        files: ${{ inputs.SOURCE_FILE }}
+        repo_token: ${{ inputs.GH_TOKEN }}
+        file: ${{ inputs.SOURCE_FILE }}
+        asset_name: ${{ inputs.DEST_NAME }}
