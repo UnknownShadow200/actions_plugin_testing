@@ -7,7 +7,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
     - id: set-matrix
-      run: 
+      run: |
 		ls . -a
 		ls .github
 		echo "matrix=$(cat .github/plugins.json | jq -R '@json')" >> $GITHUB_OUTPUT
