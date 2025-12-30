@@ -32,7 +32,9 @@ jobs:
 
       - name: Download source and cd
         run: |
+         find .
          cd ${{ matrix.directory }}
+         find .
          wget github.com/ClassiCube/ClassiCube/archive/master.zip
          unzip -q master.zip
 
