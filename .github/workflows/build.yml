@@ -10,6 +10,7 @@ jobs:
       - id: set-matrix
         run: |
           matrix_json=$(cat .github/plugins.json | jq -R '@json')
+          echo $matrix_json
           echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
 
   build_linux:
