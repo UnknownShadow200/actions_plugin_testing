@@ -33,14 +33,14 @@ jobs:
       - name: Retrieve dependencies
         run: |
          wget github.com/ClassiCube/ClassiCube/archive/master.zip
-         unzip master.zip
+         unzip -q master.zip
 
       - name: Compile plugin
         env:
           LIN32_CC: "gcc -m32"
           LIN64_CC: "gcc -m64"
           INCS: "-I ~/ClassiCube-master/src/ -I ./src/"
-          FLAGS: "-O1 -s -fno-stack-protector -fno-math-errno -Qn -nostartfiles -Wl,--entry=0"
+          FLAGS: "-O1 -s -fno-stack-protector -fno-math-errno -Qn -nostartfiles -Wl,--entry=0 -shared -fPIC"
         run: |
          cd ${{ matrix.directory }}
           
@@ -51,11 +51,11 @@ jobs:
       - uses: ./.github/actions/upload_build
         with:
           SOURCE_FILE: '${{ matrix.directory }}/${{ matrix.out_name }}_32.so'
-          DEST_NAME: '${{ matrix.out_name }}_32.so'
+          DEST_NAME: '${{ matrix.out_name }}_linux32.so'
 
       - uses: ./.github/actions/upload_build
         with:
           SOURCE_FILE: '${{ matrix.directory }}/${{ matrix.out_name }}_64.so'
-          DEST_NAME: '${{ matrix.out_name }}_64.so'
+          DEST_NAME: '${{ matrix.out_name }}_linux64.so'
  
       
