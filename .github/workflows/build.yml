@@ -11,8 +11,8 @@ jobs:
         run: |
           echo "matrix=$(cat .github/plugins.json | jq -R '@json')" >> $GITHUB_OUTPUT
 
-  job2:
-    needs: job1
+  build_linux:
+    needs: get_plugins
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{fromJson(needs.get_plugins.outputs.matrix)}}
