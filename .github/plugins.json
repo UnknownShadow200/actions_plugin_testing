@@ -8,6 +8,18 @@
 		{
 			"directory": "SchematicExporter", 
 			"out_name" : "SchematicExporter"
+		},
+		{
+			"directory": "ObjExporter", 
+			"out_name" : "ObjExporter"
+		},
+		{
+			"directory": "Scripting/Lua/Src", 
+			"out_name" : "LuaScripting"
+		},
+		{
+			"directory": "Scripting/JavaScript/Src", 
+			"out_name" : "JSScripting"
 		}
 	]
 }
