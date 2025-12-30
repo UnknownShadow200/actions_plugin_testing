@@ -8,6 +8,7 @@ jobs:
     steps:
     - id: set-matrix
       run: |
+          pwd
           ls . -a
           ls .github
           echo "matrix=$(cat .github/plugins.json | jq -R '@json')" >> $GITHUB_OUTPUT
