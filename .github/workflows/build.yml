@@ -50,12 +50,12 @@ jobs:
 
       - uses: ./.github/actions/upload_build
         with:
-          SOURCE_FILE: '${{ matrix.out_name }}_32.so'
+          SOURCE_FILE: '${{ matrix.directory }}/${{ matrix.out_name }}_32.so'
           DEST_NAME: '${{ matrix.out_name }}_32.so'
 
       - uses: ./.github/actions/upload_build
         with:
-          SOURCE_FILE: '${{ matrix.out_name }}_64.so'
+          SOURCE_FILE: '${{ matrix.directory }}/${{ matrix.out_name }}_64.so'
           DEST_NAME: '${{ matrix.out_name }}_64.so'
  
       
