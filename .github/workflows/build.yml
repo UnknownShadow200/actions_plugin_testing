@@ -20,17 +20,17 @@ jobs:
       matrix: ${{fromJson(needs.get_plugins.outputs.matrix)}}
     steps:
       - uses: actions/checkout@v4
-    - run: echo ${{ matrix.directory }}
-    - run: echo ${{ matrix.out_name }}
-    - name: Compile plugin
-      env: 
-        INCS: "-I ~/ClassiCube-master/src/ -I ./src/"
-        FLAGS: "-O1 -s -fno-stack-protector -fno-math-errno -Qn -nostartfiles -Wl,--entry=0"
-      run: |
-       wget github.com/ClassiCube/ClassiCube/archive/master.zip
-       unzip master.zip
-       cd ${{ matrix.directory }}
+      - run: echo ${{ matrix.directory }}
+      - run: echo ${{ matrix.out_name }}
+      - name: Compile plugin
+        env: 
+          INCS: "-I ~/ClassiCube-master/src/ -I ./src/"
+          FLAGS: "-O1 -s -fno-stack-protector -fno-math-errno -Qn -nostartfiles -Wl,--entry=0"
+        run: |
+         wget github.com/ClassiCube/ClassiCube/archive/master.zip
+         unzip master.zip
+         cd ${{ matrix.directory }}
           
-       gcc -m32 ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_32.so
-       gcc -m64 ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_64.so
+         gcc -m32 ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_32.so
+         gcc -m64 ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_64.so
       
