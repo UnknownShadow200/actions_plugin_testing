@@ -1,5 +1,4 @@
-name: Upload binary
-description: Uploads a compiled binary
+name: Upload and publish
 inputs:
   SOURCE_FILE:
     description: 'Path to file to upload'
@@ -9,12 +8,30 @@ inputs:
     description: 'Name to use for the uploaded artifact'
     required: true
     type: string
+  GROUP_NAME:
+    description: 'Release group name'
+    required: true
+    type: string
+  GH_TOKEN:
+    description: 'Github PAT'
+    required: true
 
 runs:
   using: "composite"
   steps:
-    - uses: actions/upload-artifact@v4
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.DEST_NAME }}
         path: ${{ inputs.SOURCE_FILE }}
         if-no-files-found: error
+
+    - name: Create release
+      uses: actions/create-release@v1.0.0
+      env:
+        GITHUB_TOKEN: ${{ inputs.GH_TOKEN }}
+      with:
+        tag_name: ${{ inputs.GROUP_NAME }}
+        release_name: Release ${{ inputs.GROUP_NAME }}
+        draft: false
+        prerelease: false
