@@ -14,11 +14,11 @@
 			"out_name" : "ObjExporter"
 		},
 		{
-			"directory": "Scripting/Lua/Src", 
+			"directory": "Scripting/Lua/src", 
 			"out_name" : "LuaScripting"
 		},
 		{
-			"directory": "Scripting/JavaScript/Src", 
+			"directory": "Scripting/JavaScript/src", 
 			"out_name" : "JSScripting"
 		}
 	]
