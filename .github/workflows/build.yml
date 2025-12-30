@@ -30,8 +30,9 @@ jobs:
           apt-get -y update
           apt-get -y install gcc-multilib wget curl unzip
 
-      - name: Retrieve dependencies
+      - name: Download source and cd
         run: |
+         cd ${{ matrix.directory }}
          wget github.com/ClassiCube/ClassiCube/archive/master.zip
          unzip -q master.zip
 
@@ -39,11 +40,9 @@ jobs:
         env:
           LIN32_CC: "gcc -m32"
           LIN64_CC: "gcc -m64"
-          INCS: "-I ~/ClassiCube-master/src/ -I ./src/"
+          INCS: "-I ./ClassiCube-master/src/ -I ./src/"
           FLAGS: "-O1 -g -fno-stack-protector -fno-math-errno -Qn -nostartfiles -Wl,--entry=0 -shared -fPIC"
-        run: |
-         cd ${{ matrix.directory }}
-          
+        run: |         
          ${{ env.LIN32_CC }} *.c ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_32.so
          ${{ env.LIN64_CC }} *.c ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_64.so
           
