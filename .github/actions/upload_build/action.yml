@@ -31,6 +31,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.GH_TOKEN }}
       with:
+        tag: ${{ inputs.GROUP_NAME }}
         repo_token: ${{ inputs.GH_TOKEN }}
         file: ${{ inputs.SOURCE_FILE }}
         asset_name: ${{ inputs.DEST_NAME }}
