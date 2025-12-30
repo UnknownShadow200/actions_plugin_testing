@@ -36,3 +36,4 @@ runs:
         file: ${{ inputs.SOURCE_FILE }}
         asset_name: ${{ inputs.DEST_NAME }}
         body: Download the appropriate file for your operating system
+        overwrite: true
