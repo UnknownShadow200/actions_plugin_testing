@@ -9,8 +9,7 @@ jobs:
       - uses: actions/checkout@v4
       - id: set-matrix
         run: |
-          matrix_json=$(cat .github/plugins.json | jq -c '@json')
-          matrix_json="${matrix_json:1:-1}"
+          matrix_json=$(cat .github/plugins.json | jq -c)
           echo "$matrix_json"
           echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
 
