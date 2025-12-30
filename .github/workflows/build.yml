@@ -1,6 +1,13 @@
 name: build
 on: push
+permissions:
+  contents: write
 jobs:
+
+
+#============================================
+# =================== SETUP =================
+# ===========================================
   get_plugins:
     runs-on: ubuntu-latest
     outputs:
@@ -10,7 +17,6 @@ jobs:
       - id: set-matrix
         run: |
           matrix_json=$(cat .github/plugins.json | jq -c)
-          echo "$matrix_json"
           echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
 
 
