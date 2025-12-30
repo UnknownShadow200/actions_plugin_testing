@@ -8,9 +8,9 @@ jobs:
     steps:
     - id: set-matrix
       run: |
-		ls . -a
-		ls .github
-		echo "matrix=$(cat .github/plugins.json | jq -R '@json')" >> $GITHUB_OUTPUT
+          ls . -a
+          ls .github
+          echo "matrix=$(cat .github/plugins.json | jq -R '@json')" >> $GITHUB_OUTPUT
 
   job2:
     needs: job1
