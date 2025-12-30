@@ -5,33 +5,34 @@
 // The proper way would be to add 'additional include directories' and 'additional libs' in Visual Studio Project properties
 // Or, you can just be lazy and change these paths for your own system. 
 // You must compile ClassiCube in both x86 and x64 configurations to generate the .lib file.
-#include "../../ClassicalSharp/src/PluginAPI.h"
+#include "PluginAPI.h"
 #if defined _WIN64
 	#pragma comment(lib, "../../../../ClassicalSharp/src/x64/Debug/ClassiCube.lib")
 #elif defined _WIN32
 	#pragma comment(lib, "../../../../ClassicalSharp/src/x86/Debug/ClassiCube.lib")
 #endif
 
-#include "../../ClassicalSharp/src/Game.h"
-#include "../../ClassicalSharp/src/String.h"
-#include "../../ClassicalSharp/src/Block.h"
-#include "../../ClassicalSharp/src/Entity.h"
-#include "../../ClassicalSharp/src/ExtMath.h"
-#include "../../ClassicalSharp/src/Chat.h"
-#include "../../ClassicalSharp/src/Stream.h"
-#include "../../ClassicalSharp/src/TexturePack.h"
-#include "../../ClassicalSharp/src/World.h"
-#include "../../ClassicalSharp/src/Funcs.h"
-#include "../../ClassicalSharp/src/Event.h"
-#include "../../ClassicalSharp/src/Server.h"
-#include "../../ClassicalSharp/src/Window.h"
-#include "../../ClassicalSharp/src/Camera.h"
-#include "../../ClassicalSharp/src/Inventory.h"
+#include "Game.h"
+#include "String.h"
+#include "Block.h"
+#include "Entity.h"
+#include "ExtMath.h"
+#include "Chat.h"
+#include "Commands.h"
+#include "Stream.h"
+#include "TexturePack.h"
+#include "World.h"
+#include "Funcs.h"
+#include "Event.h"
+#include "Server.h"
+#include "Window.h"
+#include "Camera.h"
+#include "Inventory.h"
 
 static void Backend_RaiseVoid(const char* groupName, const char* funcName);
 static void Backend_RaiseChat(const char* groupName, const char* funcName, const cc_string* msg, int msgType);
 
-static void Backend_Load(const cc_string* origName, void* obj);
+static void Backend_Load(const cc_string* origName, void* obj, int is_dir);
 static void Backend_ExecScript(const cc_string* script);
 static void Backend_Init(void);
 // retrieves last error from the scripting context
@@ -72,9 +73,9 @@ static void      Scripting_FreeBuf(sc_buffer* buf);
 static cc_string CanModifyBlock(int x, int y, int z, int newBlock) {
 	struct LocalPlayer* p = GetPlayer();
 	float reach = p->ReachDistance + 1;
-	float dx    = x - p->Base.Position.X;
-	float dy    = y - p->Base.Position.Y;
-	float dz    = z - p->Base.Position.Z;
+	float dx    = x - p->Base.Position.x;
+	float dy    = y - p->Base.Position.y;
+	float dz    = z - p->Base.Position.z;
 
 	if (dx * dx + dy * dy + dz * dz >= reach * reach)
 		return (cc_string)String_FromConst("Coordinates too far away from player");
@@ -136,22 +137,22 @@ static SCRIPTING_RESULT CC_Camera_IsThird(SCRIPTING_ARGS) {
 }
 
 static SCRIPTING_RESULT CC_Camera_GetX(SCRIPTING_ARGS) {
-	Scripting_ReturnNum(Camera.CurrentPos.X);
+	Scripting_ReturnNum(Camera.CurrentPos.x);
 }
 static SCRIPTING_RESULT CC_Camera_GetY(SCRIPTING_ARGS) {
-	Scripting_ReturnNum(Camera.CurrentPos.Y);
+	Scripting_ReturnNum(Camera.CurrentPos.y);
 }
 static SCRIPTING_RESULT CC_Camera_GetZ(SCRIPTING_ARGS) {
-	Scripting_ReturnNum(Camera.CurrentPos.Z);
+	Scripting_ReturnNum(Camera.CurrentPos.z);
 }
 
 static SCRIPTING_RESULT CC_Camera_GetYaw(SCRIPTING_ARGS) {
 	Vec2 ori = Camera.Active->GetOrientation();
-	Scripting_ReturnNum(ori.X * MATH_RAD2DEG);
+	Scripting_ReturnNum(ori.x * MATH_RAD2DEG);
 }
 static SCRIPTING_RESULT CC_Camera_GetPitch(SCRIPTING_ARGS) {
 	Vec2 ori = Camera.Active->GetOrientation();
-	Scripting_ReturnNum(ori.Y * MATH_RAD2DEG);
+	Scripting_ReturnNum(ori.y * MATH_RAD2DEG);
 }
 
 static SCRIPTING_FUNC cameraFuncs[] = {
@@ -339,15 +340,15 @@ static SCRIPTING_RESULT CC_Player_GetReach(SCRIPTING_ARGS) {
 
 static SCRIPTING_RESULT CC_Player_GetX(SCRIPTING_ARGS) {
 	struct LocalPlayer* p = GetPlayer();
-	Scripting_ReturnNum(p->Base.Position.X);
+	Scripting_ReturnNum(p->Base.Position.x);
 }
 static SCRIPTING_RESULT CC_Player_GetY(SCRIPTING_ARGS) {
 	struct LocalPlayer* p = GetPlayer();
-	Scripting_ReturnNum(p->Base.Position.Y);
+	Scripting_ReturnNum(p->Base.Position.y);
 }
 static SCRIPTING_RESULT CC_Player_GetZ(SCRIPTING_ARGS) {
 	struct LocalPlayer* p = GetPlayer();
-	Scripting_ReturnNum(p->Base.Position.Z);
+	Scripting_ReturnNum(p->Base.Position.z);
 }
 
 static SCRIPTING_RESULT CC_Player_GetYaw(SCRIPTING_ARGS) {
@@ -552,7 +553,7 @@ static SCRIPTING_RESULT CC_Window_SetTitle(SCRIPTING_ARGS) {
 }
 
 static SCRIPTING_RESULT CC_Window_GetHandle(SCRIPTING_ARGS) {
-	Scripting_ReturnPtr(WindowInfo.Handle);
+	Scripting_ReturnPtr(WindowInfo.Handle.ptr);
 }
 
 static SCRIPTING_FUNC windowFuncs[] = {
@@ -610,7 +611,9 @@ static cc_result Scripting_LoadFile(const cc_string* path, sc_buffer* mem) {
 
 static void Scripting_Init(void) {
 	const static cc_string dir = String_FromConst(SCRIPTING_DIRECTORY);
-	Directory_Create(&dir);
+	cc_filepath path;
+	Platform_EncodePath(&path, &dir);
+	Directory_Create2(&path);
 
 	Backend_Init();
 	Directory_Enum(&dir, NULL, Backend_Load);

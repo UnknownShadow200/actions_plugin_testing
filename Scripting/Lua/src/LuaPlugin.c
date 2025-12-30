@@ -30,7 +30,7 @@ static cc_string Scripting_GetStr(SCRIPTING_ARGS, int arg) {
 	cc_string str;
 	size_t len;
 
-	str.buffer   = lua_tolstring(L, arg + 1, &len);
+	str.buffer   = (char*)lua_tolstring(L, arg + 1, &len);
 	str.length   = len;
 	str.capacity = 0;
 	return str;
@@ -49,7 +49,7 @@ static sc_buffer Scripting_GetBuf(SCRIPTING_ARGS, int arg) {
 	int i, idx = arg + 1, type = lua_type(L, idx);
 
 	if (type == LUA_TSTRING) {
-		buffer.data = lua_tolstring(L, idx, &len);
+		buffer.data = (char*)lua_tolstring(L, idx, &len);
 		buffer.len  = len;
 	} else if (type == LUA_TTABLE) {
 		buffer.len  = lua_rawlen(L, idx);
@@ -167,9 +167,9 @@ static lua_State* LuaPlugin_New(void) {
 	return L;
 }
 
-static void Backend_Load(const cc_string* origName, void* obj) {
+static void Backend_Load(const cc_string* origName, void* obj, int is_dir) {
 	static cc_string ext = String_FromConst(".lua");
-	if (!String_CaselessEnds(origName, &ext)) return;
+	if (is_dir || !String_CaselessEnds(origName, &ext)) return;
 	cc_string name; char nameBuffer[601];
 	int res;
 
