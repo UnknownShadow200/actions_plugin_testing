@@ -36,12 +36,26 @@ jobs:
          unzip master.zip
 
       - name: Compile plugin
-        env: 
+        env:
+          LIN32_CC: "gcc -m32"
+          LIN64_CC: "gcc -m64"
           INCS: "-I ~/ClassiCube-master/src/ -I ./src/"
           FLAGS: "-O1 -s -fno-stack-protector -fno-math-errno -Qn -nostartfiles -Wl,--entry=0"
         run: |
          cd ${{ matrix.directory }}
           
-         gcc -m32 ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_32.so
-         gcc -m64 ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_64.so
+         ${{ env.LIN32_CC }} ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_32.so
+         ${{ env.LIN64_CC }} ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_64.so
+          
+
+      - uses: ./.github/actions/upload_build
+        with:
+          SOURCE_FILE: '${{ matrix.out_name }}_32.so'
+          DEST_NAME: '${{ matrix.out_name }}_32.so'
+
+      - uses: ./.github/actions/upload_build
+        with:
+          SOURCE_FILE: '${{ matrix.out_name }}_64.so'
+          DEST_NAME: '${{ matrix.out_name }}_64.so'
+ 
       
