@@ -2,12 +2,12 @@
 "include":
 	[
 		{
-			"project": "foo", 
-			"config" : "Debug"
+			"directory": "Pony", 
+			"out_name" : "Pony"
 		},
 		{
-			"project": "bar", 
-			"config" : "Release"
+			"directory": "SchematicExporter", 
+			"out_name" : "SchematicExporter"
 		}
 	]
 }
