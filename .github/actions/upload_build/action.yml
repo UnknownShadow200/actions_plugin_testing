@@ -26,12 +26,13 @@ runs:
         path: ${{ inputs.SOURCE_FILE }}
         if-no-files-found: error
 
-    - name: Create release
-      uses: actions/create-release@v1.0.0
+    - name: Do release
+      uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ inputs.GH_TOKEN }}
       with:
-        tag_name: ${{ inputs.GROUP_NAME }}
-        release_name: Release ${{ inputs.GROUP_NAME }}
+        name: ${{ inputs.GROUP_NAME }}
+        tag_name: Release ${{ inputs.GROUP_NAME }}
         draft: false
         prerelease: false
+        files: ${{ inputs.SOURCE_FILE }}
