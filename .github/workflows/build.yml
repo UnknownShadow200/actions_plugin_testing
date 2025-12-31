@@ -47,8 +47,8 @@ jobs:
 
       - name: Install packages
         run: |
-          apt-get -y update
-          apt-get -y install gcc-mingw-w64-i686 gcc-mingw-w64-x86-64
+          sudo apt-get -y update
+          sudo apt-get -y install gcc-mingw-w64-i686 gcc-mingw-w64-x86-64
 
       - name: Download source
         run: |
