@@ -68,21 +68,20 @@ jobs:
          cd ${{ matrix.directory }}
          WIN_FLAGS="${{ env.FLAGS }}"
          if [[ ${{ matrix.win_lite }} ]]; then
-           WIN_FLAGS += "-nostartfiles -Wl,--entry=0"
+           WIN_FLAGS="$WIN_FLAGS -nostartfiles -Wl,--entry=0"
          fi
-         echo $WIN_FLAGS
 
          rm -f ClassiCube.exe ClassiCube.def libClassiCube.a
          cp cc-32.exe ClassiCube.exe
          gendef ClassiCube.exe
          i686-w64-mingw32-dlltool -d ClassiCube.def -l libClassiCube.a -D ClassiCube.exe
-         ${{ env.WIN32_CC }} *.c ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_32.dll
+         ${{ env.WIN32_CC }} *.c ${{ env.INCS }} $WIN_FLAGS -o ${{ matrix.out_name }}_32.dll
 
          rm -f ClassiCube.exe ClassiCube.def libClassiCube.a
          cp cc-64.exe ClassiCube.exe
          gendef ClassiCube.exe
          x86_64-w64-mingw32-dlltool -d ClassiCube.def -l libClassiCube.a -D ClassiCube.exe
-         ${{ env.WIN64_CC }} *.c ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_64.dll
+         ${{ env.WIN64_CC }} *.c ${{ env.INCS }} $WIN_FLAGS -o ${{ matrix.out_name }}_64.dll
           
 
       - uses: ./.github/actions/upload_build
