@@ -30,15 +30,14 @@ jobs:
           matrix_json=$(cat .github/plugins.json | jq -c)
           echo "matrix=$matrix_json" >> $GITHUB_OUTPUT
 
+
 #============================================
-#==================== RPI32 =================
+#==================== LINUX =================
 #============================================
-  build_linux:
+  build_windows:
     needs: get_plugins    
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    container:
-      image: dockcross/linux-armv6-lts
     strategy:
       max-parallel: 1
       matrix: ${{fromJson(needs.get_plugins.outputs.matrix)}}
@@ -46,26 +45,52 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install packages
+        run: |
+          apt-get -y update
+          apt-get -y install gcc-mingw-w64-i686 gcc-mingw-w64-x86-64
+
       - name: Download source
         run: |
          cd ${{ matrix.directory }}
-         wget github.com/ClassiCube/ClassiCube/archive/master.zip
+         wget https://github.com/ClassiCube/ClassiCube/archive/master.zip
          unzip -q master.zip
+         wget https://cs.classicube.net/client/latest/ClassiCube.exe -O cc-32.exe
+         wget https://cs.classicube.net/client/latest/ClassiCube.64.exe -O cc-64.exe
 
       - name: Compile plugin
         env:
-          RPI_CC: "gcc"
-          INCS:   "-I ./ClassiCube-master/src/"
-          FLAGS:  "-O1 -g -fno-stack-protector -fno-math-errno -Qn -fvisibility=hidden -nostartfiles -Wl,--entry=0 -shared -fPIC -Werror"
+          WIN32_CC: "i686-w64-mingw32-gcc"
+          WIN64_CC: "x86_64-w64-mingw32-gcc"
+          INCS:  "-I ./ClassiCube-master/src/"
+          FLAGS: "-O1 -g -fno-stack-protector -fno-math-errno -Qn -fvisibility=hidden -nostartfiles -Wl,--entry=0 -shared -fPIC -Werror -L. -lClassiCube"
         run: |         
          cd ${{ matrix.directory }}
-         ${{ env.RPI_CC }} *.c ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_32.so
+
+         rm ClassiCube.exe ClassiCube.def
+         cp cc-32.exe ClassiCube.exe
+         gendef ClassiCube.exe
+         i686-w64-mingw32-dlltool -d ClassiCube.def -l libClassiCube.a -D ClassiCube.exe
+         ${{ env.WIN32_CC }} *.c ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_32.dll
+
+         rm ClassiCube.exe ClassiCube.def
+         cp cc-64.exe ClassiCube.exe
+         gendef ClassiCube.exe
+         x86_64-w64-mingw32-dlltool -d ClassiCube.def -l libClassiCube.a -D ClassiCube.exe
+         ${{ env.WIN64_CC }} *.c ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_64.dll
           
 
       - uses: ./.github/actions/upload_build
         with:
-          SOURCE_FILE: '${{ matrix.directory }}/${{ matrix.out_name }}_32.so'
-          DEST_NAME:   '${{ matrix.out_name }}_rpi_32.so'
+          SOURCE_FILE: '${{ matrix.directory }}/${{ matrix.out_name }}_32.dll'
+          DEST_NAME:   '${{ matrix.out_name }}_windows_32.dll'
+          GROUP_NAME:  '${{ matrix.out_name }}'
+          GH_TOKEN:    '${{ secrets.GITHUB_TOKEN }}'
+
+      - uses: ./.github/actions/upload_build
+        with:
+          SOURCE_FILE: '${{ matrix.directory }}/${{ matrix.out_name }}_64.dll'
+          DEST_NAME:   '${{ matrix.out_name }}_windows_64.dll'
           GROUP_NAME:  '${{ matrix.out_name }}'
           GH_TOKEN:    '${{ secrets.GITHUB_TOKEN }}'
 
@@ -73,5 +98,5 @@ jobs:
       - uses: ./.github/actions/notify_failure
         if: failure()
         with:
-          NOTIFY_MESSAGE: 'Failed to produce ${{ matrix.out_name }} plugin for RPi'
+          NOTIFY_MESSAGE: 'Failed to produce ${{ matrix.out_name }} plugin for Windows'
           WEBHOOK_URL: '${{ secrets.WEBHOOK_URL }}'
