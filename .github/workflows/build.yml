@@ -1,7 +1,17 @@
 name: build
-on: push
+# trigger via either push to selected branches or on manual run
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
 permissions:
   contents: write
+concurrency:
+  cancel-in-progress: true
+
 jobs:
 
 
@@ -43,9 +53,9 @@ jobs:
 
       - name: Compile plugin
         env:
-          RPICC: "gcc"
-          INCS:  "-I ./ClassiCube-master/src/"
-          FLAGS: "-O1 -g -fno-stack-protector -fno-math-errno -Qn -fvisibility=hidden -nostartfiles -Wl,--entry=0 -shared -fPIC -Werror"
+          RPI_CC: "gcc"
+          INCS:   "-I ./ClassiCube-master/src/"
+          FLAGS:  "-O1 -g -fno-stack-protector -fno-math-errno -Qn -fvisibility=hidden -nostartfiles -Wl,--entry=0 -shared -fPIC -Werror"
         run: |         
          cd ${{ matrix.directory }}
          ${{ env.RPI_CC }} *.c ${{ env.INCS }} ${{ env.FLAGS }} -o ${{ matrix.out_name }}_32.so
