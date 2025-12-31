@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
 concurrency:
+  group: ${{ github.ref }}-plugins
   cancel-in-progress: true
 
 jobs:
