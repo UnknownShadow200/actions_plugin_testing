@@ -66,7 +66,7 @@ jobs:
           FLAGS: "-O1 -s -fno-stack-protector -fno-math-errno -Qn -Werror -L. -lClassiCube"
         run: |         
          cd ${{ matrix.directory }}
-         WIN_FLAGS=${{ env.FLAGS }}
+         WIN_FLAGS="${{ env.FLAGS }}"
          if [[ ${{ matrix.win_lite }} ]]; then
            WIN_FLAGS += "-nostartfiles -Wl,--entry=0"
          fi
