@@ -67,7 +67,7 @@ jobs:
         run: |         
          cd ${{ matrix.directory }}
          WIN_FLAGS="${{ env.FLAGS }}"
-         if [[ ${{ matrix.win_lite }} ]]; then
+         if [[ ${{ matrix.win_lite }} == "true" ]]; then
            WIN_FLAGS="$WIN_FLAGS -nostartfiles -Wl,--entry=0"
          fi
 
