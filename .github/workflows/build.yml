@@ -63,9 +63,14 @@ jobs:
           WIN32_CC: "i686-w64-mingw32-gcc"
           WIN64_CC: "x86_64-w64-mingw32-gcc"
           INCS:  "-I ./ClassiCube-master/src/"
-          FLAGS: "-O1 -g -fno-stack-protector -fno-math-errno -Qn -fvisibility=hidden -nostartfiles -Wl,--entry=0 -shared -fPIC -Werror -L. -lClassiCube"
+          FLAGS: "-O1 -s -fno-stack-protector -fno-math-errno -Qn -Werror -L. -lClassiCube"
         run: |         
          cd ${{ matrix.directory }}
+         WIN_FLAGS=${{ env.FLAGS }}
+         if [[ ${{ matrix.win_lite }} ]]; then
+           WIN_FLAGS += "-nostartfiles -Wl,--entry=0"
+         fi
+         echo $WIN_FLAGS
 
          rm -f ClassiCube.exe ClassiCube.def libClassiCube.a
          cp cc-32.exe ClassiCube.exe
